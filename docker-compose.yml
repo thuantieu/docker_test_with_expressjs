@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  db:
+    container_name: pg_container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: test_db
+    ports:
+      - "5432:5432"
+    networks:
+      - default
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  app:
+    container_name: node_app_container
+    image: node_app:latest
+    restart: always
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    networks:
+      - default
+    environment:
+      - DB=test_db
+      - USER=root
+      - PASSWORD=root
+      - HOST=pg_container
+    depends_on:
+      - db
+
+volumes:
+  db-data:
+networks:
+  default:
